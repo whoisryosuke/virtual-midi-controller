@@ -3,7 +3,6 @@ use std::{sync::Mutex, thread::sleep, time::Duration};
 use midir::{MidiOutput, MidiOutputConnection, MidiOutputPort, MidiOutputPorts};
 use tauri::{Builder, Manager, State};
 struct AppData {
-  welcome_message: &'static str,
   midi_channel: MidiOutput,
   midi_ports: MidiOutputPorts,
   current_port: Option<MidiOutputPort>,
@@ -11,11 +10,6 @@ struct AppData {
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(state: State<'_, Mutex<AppData>>) -> String {
-    let mut state = state.lock().unwrap();
-    format!("Hello, {}! You've been greeted from Rust!", state.welcome_message)
-}
 
 #[tauri::command]
 fn midi_connect_to_port(state: State<'_, Mutex<AppData>>) {
@@ -49,6 +43,30 @@ fn midi_play_note(state: State<'_, Mutex<AppData>>, note: u8) {
 }
 
 #[tauri::command]
+fn midi_play_note_press(state: State<'_, Mutex<AppData>>, note: u8) {
+    let mut state = state.lock().unwrap();
+    let connection = state.connection.as_mut().unwrap();
+
+    const NOTE_ON_MSG: u8 = 0x90;
+    const VELOCITY: u8 = 0x64;
+    // We're ignoring errors in here
+    let _ = connection.send(&[NOTE_ON_MSG, note, VELOCITY]);
+
+}
+
+#[tauri::command]
+fn midi_play_note_release(state: State<'_, Mutex<AppData>>, note: u8) {
+    let mut state = state.lock().unwrap();
+    let connection = state.connection.as_mut().unwrap();
+
+    const NOTE_OFF_MSG: u8 = 0x80;
+    const VELOCITY: u8 = 0x64;
+    // We're ignoring errors in here
+    let _ = connection.send(&[NOTE_OFF_MSG, note, VELOCITY]);
+
+}
+
+#[tauri::command]
 fn midi_get_ports(state: State<'_, Mutex<AppData>>) -> Vec<String> {
     let state = state.lock().unwrap();
     let ports = state.midi_ports.clone();
@@ -73,7 +91,6 @@ pub fn run() {
             let midi_out = MidiOutput::new("My Test Output").unwrap();
             let midi_ports = midi_out.ports();
             app.manage(Mutex::new(AppData {
-                welcome_message: "Welcome to Tauri!",
                 midi_channel: midi_out,
                 midi_ports: midi_ports,
                 current_port: None,
@@ -82,7 +99,7 @@ pub fn run() {
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, midi_connect_to_port, midi_play_note, midi_get_ports,midi_set_port])
+        .invoke_handler(tauri::generate_handler![midi_connect_to_port, midi_play_note, midi_get_ports,midi_set_port,midi_play_note_press, midi_play_note_release])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

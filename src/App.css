@@ -114,3 +114,22 @@ button {
     background-color: #0f0f0f69;
   }
 }
+
+.piano-keys-container {
+  display: flex;
+}
+
+.piano-key {
+  width: 3rem;
+  height: 10rem;
+  background-color: rgba(225, 225, 225, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(0, 30, 225, 1);
+}
+
+.piano-key:hover {
+  background-color: rgba(0, 30, 225, 1);
+  color: rgba(225, 225, 225, 1);
+}

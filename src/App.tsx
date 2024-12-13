@@ -2,6 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import PianoKeys from "./components/PianoKeys";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -45,6 +46,7 @@ function App() {
           <option value={index}>{name}</option>
         ))}
       </select>
+      <PianoKeys />
     </main>
   );
 }
