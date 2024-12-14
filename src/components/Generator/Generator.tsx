@@ -81,7 +81,8 @@ const Generator = (props: Props) => {
 
   useEffect(() => {
     // Create note
-    const note = teoria.note(`${rootNote}${octave}`);
+    const fixedNote = rootNote.replace("#", "b");
+    const note = teoria.note(`${fixedNote}${octave}`);
     let newNotes = [];
     switch (config.type) {
       case "scale":
@@ -97,6 +98,7 @@ const Generator = (props: Props) => {
 
   return (
     <div>
+      <h1>Music Theory Generator</h1>
       <div style={{ display: "flex" }}>
         <select value={rootNote} onChange={handleRootNoteChange}>
           {PIANO_KEY_NOTES.map((pianoKey) => (
