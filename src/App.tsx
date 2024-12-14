@@ -63,7 +63,7 @@ function App() {
       <h1>Virtual MIDI Controller</h1>
       <button onClick={getPorts}>Refresh Ports</button>
       <button onClick={connectPort}>Connect to Port</button>
-      <button onClick={handlePlayNote}>Play note</button>
+      <button onClick={handlePlayNote}>Play debug note</button>
       <select value={currentPort} onChange={handlePortChange}>
         {ports.map((name, index) => (
           <option value={index}>{name}</option>
