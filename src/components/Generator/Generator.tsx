@@ -70,11 +70,13 @@ const Generator = (props: Props) => {
   }
 
   const handlePlayNotes = async () => {
-    await Promise.all([
-      invoke("midi_play_note", { note: 54 }),
-      wait(),
-      invoke("midi_play_note", { note: 56 }),
-    ]);
+    // await Promise.all([
+    //   invoke("midi_play_note", { note: 54 }),
+    //   wait(),
+    //   invoke("midi_play_note", { note: 56 }),
+    // ]);
+    const noteMidiKeys = notes.map((note) => note.midi());
+    await invoke("midi_play_notes", { notes: noteMidiKeys });
   };
 
   useEffect(() => {
@@ -90,7 +92,7 @@ const Generator = (props: Props) => {
         break;
     }
     console.log("new notes", newNotes);
-    // setNotes(newNotes);
+    setNotes(newNotes);
   }, [rootNote, octave]);
 
   return (
