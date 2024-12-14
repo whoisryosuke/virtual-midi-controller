@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
@@ -8,6 +8,7 @@ import Generator from "./components/Generator/Generator";
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [ports, setPorts] = useState([]);
+  const [currentPort, setCurrentPort] = useState(0);
   const [name, setName] = useState("");
 
   async function greet() {
@@ -28,21 +29,42 @@ function App() {
     setPorts(newPorts);
   }
 
+  async function changePort(index) {
+    await invoke("midi_set_port", { index: parseInt(index) });
+    setCurrentPort(index);
+  }
+
   async function handlePortChange(e) {
-    await invoke("midi_set_port", { index: parseInt(e.currentTarget.value) });
+    await changePort(parseInt(e.currentTarget.value));
   }
 
   async function handlePlayNote() {
     await invoke("midi_play_note", { note: 54 });
   }
 
+  useEffect(() => {
+    console.log("Getting MIDI ports");
+    getPorts();
+  }, []);
+
+  useEffect(() => {
+    console.log("Setting virtual port as default");
+    if (ports.length < 0) return;
+    const virtualPort = ports.findIndex(
+      (name) => name == "LoopBe Internal MIDI"
+    );
+    if (virtualPort < 0) return;
+    changePort(virtualPort);
+    setCurrentPort(virtualPort);
+  }, [ports]);
+
   return (
     <main className="container">
       <h1>Virtual MIDI Controller</h1>
-      <button onClick={getPorts}>Get Ports</button>
+      <button onClick={getPorts}>Refresh Ports</button>
       <button onClick={connectPort}>Connect to Port</button>
       <button onClick={handlePlayNote}>Play note</button>
-      <select onChange={handlePortChange}>
+      <select value={currentPort} onChange={handlePortChange}>
         {ports.map((name, index) => (
           <option value={index}>{name}</option>
         ))}
