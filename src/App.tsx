@@ -3,6 +3,7 @@ import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import PianoKeys from "./components/PianoKeys";
+import Generator from "./components/Generator/Generator";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -47,6 +48,7 @@ function App() {
         ))}
       </select>
       <PianoKeys />
+      <Generator />
     </main>
   );
 }
